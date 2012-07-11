@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+
+<suite name="tests" verbose="10" parallel="false">
+
+   <test name="test">
+       <classes>
+           <class name="pl.kwisniewski.integration_tests.PageTest"/>
+       </classes>
+   </test>
+	
+</suite>
