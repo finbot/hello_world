@@ -21,7 +21,7 @@
 		<loc.server.path>/${artifactId}</loc.server.path>
 		
 		<!-- Remote server -->
-		<rem.server.url>http://localhost:8080/manager/html</rem.server.url>
+		<rem.server.url>http://94.23.4.104:8080/manager/html</rem.server.url>
 		<rem.server.username>admin</rem.server.username>
 		<rem.server.password>P@ssw0rd</rem.server.password>
 		<rem.server.path>/${artifactId}</rem.server.path>
