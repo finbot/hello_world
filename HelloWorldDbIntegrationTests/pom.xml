@@ -8,7 +8,12 @@
 	
 	
 	<properties>
-	
+
+        <!-- Path to remote resources -->
+        <rem.resources.path>${basedir}/src/rem/resources</rem.resources.path>
+        <!-- Path to production resources -->
+        <prod.resources.path>${basedir}/src/prod/resources</prod.resources.path>
+
 		<!-- Local server -->
 		<loc.server.url>http://localhost:8080/manager/html</loc.server.url>
 		<loc.server.username>admin</loc.server.username>
@@ -32,6 +37,17 @@
 	
 	<build>
 		<finalName>${artifactId}</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources/</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources/</directory>
+            </testResource>
+        </testResources>
 		
 		<plugins>
 			<plugin>
@@ -143,38 +159,17 @@
       			<activeByDefault>true</activeByDefault>
       		</activation>
       		<build>
-      			<resources>		
-					<resource>
-						<directory>src/main/resources/</directory>
-					</resource>
-					<resource>
-						<directory>src/loc/resources/</directory>
-					</resource>
-				</resources>
-				<testResources>
-					<testResource>
-						<directory>src/test/resources/</directory>
-					</testResource>
-					<testResource>
-						<directory>src/loc/resources/</directory>
-					</testResource>
-				</testResources>
 				<plugins>
-								
-					<!-- Run unit tests -->
+
+                    <!-- Skip default tests -->
 					<plugin>
 			            <groupId>org.apache.maven.plugins</groupId>
 			            <artifactId>maven-surefire-plugin</artifactId>
 			            <version>2.5</version>
-			            <configuration>			            	
-			                <parallel>true</parallel>
-			                <threadCount>10</threadCount>
-			                <suiteXmlFiles>
-			                    <suiteXmlFile>src/test/resources/test-unit.xml</suiteXmlFile>
-			                </suiteXmlFiles>
-			            </configuration>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
 			        </plugin>
-			        
 			        
 			         <!-- Deploy application -->
 					<plugin>
@@ -197,7 +192,7 @@
 				        </configuration>
 				      </plugin>
 				      
-				      <!-- Run integration tests -->
+				      <!-- Run tests -->
 				      <plugin>
 				        <groupId>org.apache.maven.plugins</groupId>
 				        <artifactId>maven-failsafe-plugin</artifactId>
@@ -206,18 +201,19 @@
 				        	<execution>
 				        		<goals>
 					              <goal>integration-test</goal>
-					              <!-- goal>verify</goal -->
+                                  <goal>verify</goal>
 					            </goals>
+                                <configuration>
+                                    <parallel>true</parallel>
+                                    <threadCount>10</threadCount>
+                                    <suiteXmlFiles>
+                                        <suiteXmlFile>src/test/resources/test-unit.xml</suiteXmlFile>
+                                        <suiteXmlFile>src/test/resources/test-intg.xml</suiteXmlFile>
+                                    </suiteXmlFiles>
+                                </configuration>
 				        	</execution>
 				        </executions>
-				        <configuration>
-			                <parallel>true</parallel>
-			                <threadCount>10</threadCount>
-			                <suiteXmlFiles>
-			                    <suiteXmlFile>src/test/resources/test-intg.xml</suiteXmlFile>
-			                </suiteXmlFiles>
-				        </configuration>
-				      </plugin>	
+				      </plugin>
 				      
 				</plugins>
       		</build>
@@ -231,39 +227,56 @@
       			<activeByDefault>false</activeByDefault>
       		</activation>
       		<build>
-      			<resources>		
-					<resource>
-						<directory>src/main/resources/</directory>
-					</resource>
-					<resource>
-						<directory>src/rem/resources/</directory>
-					</resource>
-				</resources>
-				<testResources>
-					<testResource>
-						<directory>src/test/resources/</directory>
-					</testResource>
-					<testResource>
-						<directory>src/rem/resources/</directory>
-					</testResource>
-				</testResources>
 				<plugins>
-								
-					<!-- Run unit tests -->
-					<plugin>
-			            <groupId>org.apache.maven.plugins</groupId>
-			            <artifactId>maven-surefire-plugin</artifactId>
-			            <version>2.5</version>
-			            <configuration>			            	
-			                <parallel>true</parallel>
-			                <threadCount>10</threadCount>
-			                <suiteXmlFiles>
-			                    <suiteXmlFile>src/test/resources/test-unit.xml</suiteXmlFile>
-			                </suiteXmlFiles>
-			            </configuration>
-			        </plugin>
-			        
-			        
+
+                    <!-- Override default resources -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.5</version>
+                        <executions>
+                            <execution>
+                                <id>generate-test-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${rem.resources.path}</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-resources</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${rem.resources.path}</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Skip default tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.5</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+
 			         <!-- Deploy application -->
 					<plugin>
 				        <groupId>org.apache.tomcat.maven</groupId>
@@ -285,7 +298,7 @@
 				        </configuration>
 				      </plugin>
 				      
-				      <!-- Run integration tests -->
+				      <!-- Run tests -->
 				      <plugin>
 				        <groupId>org.apache.maven.plugins</groupId>
 				        <artifactId>maven-failsafe-plugin</artifactId>
@@ -294,7 +307,7 @@
 				        	<execution>
 				        		<goals>
 					              <goal>integration-test</goal>
-					              <!-- goal>verify</goal -->
+					              <goal>verify</goal>
 					            </goals>
 				        	</execution>
 				        </executions>
@@ -302,6 +315,7 @@
 			                <parallel>true</parallel>
 			                <threadCount>10</threadCount>
 			                <suiteXmlFiles>
+                                <suiteXmlFile>src/test/resources/test-unit.xml</suiteXmlFile>
 			                    <suiteXmlFile>src/test/resources/test-intg.xml</suiteXmlFile>
 			                </suiteXmlFiles>
 				        </configuration>
@@ -310,34 +324,64 @@
 				</plugins>
       		</build>
     	</profile>
-    	
-    	
-    	<!-- Profile PROD -->
-		<profile>
-      		<id>prod</id>
-      		<activation>
-      			<activeByDefault>false</activeByDefault>
-      		</activation>
-      		<build>
-      			<resources>		
-					<resource>
-						<directory>src/main/resources/</directory>
-					</resource>
-					<resource>
-						<directory>src/prod/resources/</directory>
-					</resource>
-				</resources>				
-				<plugins>
-								
-					<!-- Run unit tests -->
-					<plugin>
-			            <groupId>org.apache.maven.plugins</groupId>
-			            <artifactId>maven-surefire-plugin</artifactId>
-			            <version>2.5</version>
-			            <configuration>			            	
-			                <skip>true</skip>
-			            </configuration>
-			        </plugin>
+
+
+        <!-- Profile PROD -->
+        <profile>
+            <id>prod</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+
+                    <!-- Override default resources -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.5</version>
+                        <executions>
+                            <execution>
+                                <id>generate-test-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${prod.resources.path}</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-resources</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${prod.resources.path}</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Skip default tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.5</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
 			        
 			        
 			         <!-- Deploy application -->
