@@ -10,7 +10,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/x
       <class>pl.kwisniewski.entities.plain.SimpleEntity</class>
       
       <properties>
-            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/data_base_rem"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://94.23.4.104:3306/data_base_rem"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.connection.username" value="root"/>
             <property name="hibernate.connection.password" value="P@ssw0rd"/>
